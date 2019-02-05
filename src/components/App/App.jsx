@@ -1,25 +1,52 @@
-import React, { Component } from 'react';
-import './App.css';
+import React, { Component } from "react";
+
+import SwapiService from "../../services/SwapiService";
+
+import Nav from "../nav";
+import Random from '../random';
+import VehiclePage from '../vehicle-page';
+import PersonPage from '../person-page';
+import PlanetsPage from '../planets-page';
+
+import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom';
+
+import { SwapiServiceProvider } from '../swapi-service-context';
+
+import "./App.css";
 
 class App extends Component {
+
+  swapi = new SwapiService();
+
+  state = {
+    selectedItem: null
+  };
+
   render() {
+
+    this.swapi.getAllVehicles()
+      .then(vh => {
+        console.log(vh)
+      });
+
     return (
-      <div className="App">
-        <header className="App-header">
-          <img src='https://avatars2.githubusercontent.com/u/35522827?s=460&v=4' className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
+      <SwapiServiceProvider value={this.swapi}>
+        <BrowserRouter>
+          <div className="app">
+            <Nav />
+            <Random />
+              <React.Fragment>
+                <Switch>
+                  <Route path='/' exact render={() => <div className='container'><h1>Welocme to Star Wars DB</h1></div> } />
+                  <Route path='/vehicle/:id?' component={VehiclePage}/>
+                  <Route path='/person/:id?' component={PersonPage}/>
+                  <Route path='/planets' component={PlanetsPage}/>
+                  <Redirect to='/' />
+                </Switch>
+              </React.Fragment>
+          </div>
+        </BrowserRouter>
+      </SwapiServiceProvider>
     );
   }
 }
